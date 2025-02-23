@@ -1,10 +1,103 @@
 # Practice-Repository
-Created this repository to add my work in it.
+
+Here's a **Java Selenium & REST Assured Cheat Sheet** organized in an Excel-like table format. This combines key concepts, methods, and workflows for both web automation (Selenium) and API testing (REST Assured):
+
+---
+
+### **Java Selenium Cheat Sheet**
+
+| **Category**          | **Key Concepts/Methods**                                                                 | **Example/Notes**                                                                 |
+|-----------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| **Setup**             | `WebDriver` initialization                                                              | `WebDriver driver = new ChromeDriver();`<br>`System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");` |
+| **Navigation**        | `get()`, `navigate().to()`, `navigate().back()`, `navigate().forward()`, `refresh()`     | `driver.get("https://example.com");`<br>`driver.navigate().back();`               |
+| **Locators**          | `By.id()`, `By.name()`, `By.xpath()`, `By.cssSelector()`, `By.className()`, `By.tagName()` | `driver.findElement(By.id("username"));`<br>`driver.findElements(By.xpath("//div[@class='item']"));` |
+| **Element Interaction**| `click()`, `sendKeys()`, `clear()`, `submit()`, `getText()`, `getAttribute()`, `isDisplayed()` | `element.sendKeys("text");`<br>`element.getAttribute("href");`                    |
+| **Waits**             | Implicit Wait: `driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);`<br>Explicit Wait: `WebDriverWait` + `ExpectedConditions` | `WebDriverWait wait = new WebDriverWait(driver, 10);`<br>`wait.until(ExpectedConditions.visibilityOf(element));` |
+| **Dropdowns**         | `Select` class: `selectByValue()`, `selectByIndex()`, `selectByVisibleText()`            | `Select dropdown = new Select(driver.findElement(By.id("dropdown")));`<br>`dropdown.selectByIndex(1);` |
+| **Frames/Alerts**     | Switch to frame: `driver.switchTo().frame("frameName");`<br>Handle alerts: `Alert alert = driver.switchTo().alert();` | `alert.accept();`<br>`alert.dismiss();`                                           |
+| **Cookies**           | `manage().addCookie()`, `getCookieNamed()`, `deleteAllCookies()`                         | `driver.manage().addCookie(new Cookie("name", "value"));`                         |
+| **Screenshot**        | `TakesScreenshot` interface: `getScreenshotAs()`                                         | `File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);`      |
+| **Advanced**          | Actions class (`dragAndDrop()`, `doubleClick()`), JavaScriptExecutor                     | `Actions actions = new Actions(driver);`<br>`actions.dragAndDrop(source, target).perform();` |
+
+---
+
+### **REST Assured Cheat Sheet**
+
+| **Category**          | **Key Concepts/Methods**                                                                 | **Example/Notes**                                                                 |
+|-----------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| **Setup**             | Maven Dependency:                                                                        | ```xml<br><dependency><br>  <groupId>io.rest-assured</groupId><br>  <artifactId>rest-assured</artifactId><br>  <version>5.3.0</version><br></dependency>``` |
+| **Request Basics**    | `given()`, `when()`, `then()`                                                            | ```java<br>given().param("key", "value")<br>.when().get("/endpoint")<br>.then().statusCode(200);``` |
+| **HTTP Methods**      | `get()`, `post()`, `put()`, `delete()`, `patch()`                                        | `when().post("/users");`<br>`when().put("/users/1");`                            |
+| **Headers/Body**      | `header()`, `contentType()`, `body()`                                                    | `given().header("Authorization", "Bearer token")`<br>`.body(jsonPayload).when().post(...);` |
+| **Path/Query Params** | `pathParam()`, `queryParam()`                                                            | `given().pathParam("id", 123).when().get("/users/{id}");`                        |
+| **JSON Validation**   | `body("key", equalTo(value))`, `body("list.size()", equalTo(3))`                         | `.then().body("data.name", equalTo("John"))`<br>`.body("users[0].id", equalTo(1));` |
+| **Schema Validation** | `matchesJsonSchemaInClasspath()`                                                         | `.then().body(matchesJsonSchemaInClasspath("schema.json"));`                     |
+| **Authentication**    | `auth().basic()`, `auth().oauth2()`, `auth().preemptive()`                               | `given().auth().basic("user", "pass")`<br>`given().auth().oauth2("token")`       |
+| **Response Extraction**| `extract().response()`, `jsonPath()`, `xmlPath()`                                        | `Response response = get("/users").then().extract().response();`<br>`String name = response.jsonPath().get("data.name");` |
+| **Logging**           | `log().all()`, `log().body()`, `log().headers()`                                         | `given().log().all().when().get(...)`<br>`then().log().body();`                  |
+| **Advanced**          | Multipart requests, SSL configuration, Filters                                           | `given().multiPart("file", new File("test.txt"))`<br>`given().relaxedHTTPSValidation();` |
+
+---
+
+### **Key Notes**  
+**Selenium Best Practices**:  
+1. Use explicit waits over implicit waits.  
+2. Avoid `Thread.sleep()`; prefer `ExpectedConditions`.  
+3. Use `Page Object Model (POM)` for maintainability.  
+4. Close sessions with `driver.quit()`.  
+
+**REST Assured Best Practices**:  
+1. Reuse specifications with `RequestSpecBuilder`/`ResponseSpecBuilder`.  
+2. Validate status codes, headers, and schemas.  
+3. Use JSON/XML path assertions for complex validations.  
+4. Extract reusable values from responses (e.g., tokens).  
+
+---
+
+### **Common Imports**  
+```java
+// Selenium  
+import org.openqa.selenium.*;  
+import org.openqa.selenium.support.ui.*;  
+
+// REST Assured  
+import io.restassured.RestAssured.*;  
+import io.restassured.matcher.RestAssuredMatchers.*;  
+import io.restassured.path.json.JsonPath;  
+import static org.hamcrest.Matchers.*;  
+```
+
+---
+
+### **Example Workflows**  
+**Selenium**: Login Test  
+```java  
+driver.get("https://example.com/login");  
+driver.findElement(By.id("username")).sendKeys("user");  
+driver.findElement(By.id("password")).sendKeys("pass");  
+driver.findElement(By.id("submit")).click();  
+WebDriverWait wait = new WebDriverWait(driver, 10);  
+wait.until(ExpectedConditions.titleContains("Dashboard"));  
+```
+
+**REST Assured**: API Test  
+```java  
+given()  
+  .baseUri("https://api.example.com")  
+  .header("Content-Type", "application/json")  
+  .body("{ \"name\": \"John\" }")  
+.when()  
+  .post("/users")  
+.then()  
+  .statusCode(201)  
+  .body("id", notNullValue())  
+  .body("name", equalTo("John"));  
+```
+
+---
 
 
-(Due to technical issues, the search service is temporarily unavailable.)
-
-Got it! Let’s create a **comprehensive interview-focused cheat sheet** that covers **Java**, **Selenium**, and **REST Assured**, including **scenarios**, **best practices**, **common questions**, and **edge cases**. I’ll break this into sections for clarity.
+**comprehensive interview-focused cheat sheet** that covers **Java**, **Selenium**, and **REST Assured**, including **scenarios**, **best practices**, **common questions**, and **edge cases**. I’ll break this into sections for clarity.
 
 ---
 
@@ -107,4 +200,4 @@ Got it! Let’s create a **comprehensive interview-focused cheat sheet** that co
 2. **Performance**: Mention tools like JMeter or Gatling if asked about performance testing.  
 3. **Stay Calm**: For coding challenges, talk through your thought process. Interviewers care about how you approach problems.  
 
-Let me know if you want to deep-dive into any specific area! 🚀
+          **GOOD LUCK**
